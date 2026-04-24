@@ -2,6 +2,7 @@
 #include "screen.h"
 #include "pic.h"
 #include "screen.h"
+#include "io.h"
 
 typedef unsigned char  u8;
 typedef unsigned short u16;
@@ -97,8 +98,35 @@ void isr0x30_handler(void) {
     }
 }
 
+// irq1 => keyboard interrupt
 void irq1_handler(void) {
-    println("KEYBOARD IRQ");
+    
+    unsigned char scancode = inb(0x60);
+    static unsigned char key_down[256];
+    static unsigned char extended = 0;
+
+    if (scancode == 0xE0) {
+        extended = 1;
+        return;
+    }
+
+    if (scancode & 0x80) {
+        unsigned char code = scancode & 0x7F;
+
+        if (extended)
+            key_down[code + 128] = 0;
+        else
+            key_down[code] = 0;
+
+    } else {
+        if (extended)
+            key_down[scancode + 128] = 1;
+        else
+            key_down[scancode] = 1;
+    }
+
+    extended = 0;
+
     pic_send_eoi(1);
 }
 
