@@ -3,7 +3,6 @@
 
 
 void itoa(int val, char* buf);
-void itohex(int val, char* buf);
 
 
 /*
@@ -29,7 +28,6 @@ void itoa(int val, char* buf) {
 
 	if (val < 0)
 	{
-		println("no minus");
 		return;
 	}
 
@@ -51,10 +49,6 @@ void itoa(int val, char* buf) {
 
 	return;
 
-}
-
-void itohex(int val, char* buf) {
-	return;
 }
 
 
