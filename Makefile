@@ -11,13 +11,16 @@ LDFLAGS = -m elf_i386 -T linker.ld
 
 OBJS = \
 	$(BUILD_DIR)/boot.o \
+	$(BUILD_DIR)/stdlib.o \
 	$(BUILD_DIR)/gdt_flush.o \
 	$(BUILD_DIR)/interrupt.o \
 	$(BUILD_DIR)/kernel.o \
 	$(BUILD_DIR)/screen.o \
 	$(BUILD_DIR)/idt.o \
+	$(BUILD_DIR)/irq.o \
 	$(BUILD_DIR)/gdt.o \
-	$(BUILD_DIR)/pic.o
+	$(BUILD_DIR)/pic.o \
+	$(BUILD_DIR)/keyboard.o
 
 all: myos.iso
 
@@ -26,6 +29,9 @@ $(BUILD_DIR):
 
 $(BUILD_DIR)/boot.o: boot/boot.asm | $(BUILD_DIR)
 	$(AS) -f elf32 $< -o $@
+
+$(BUILD_DIR)/stdlib.o: include/stdlib.c include/stdlib.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/gdt_flush.o: boot/gdt_flush.asm | $(BUILD_DIR)
 	$(AS) -f elf32 $< -o $@
@@ -42,10 +48,16 @@ $(BUILD_DIR)/screen.o: drivers/screen.c drivers/screen.h | $(BUILD_DIR)
 $(BUILD_DIR)/idt.o: arch/x86/idt.c arch/x86/idt.h drivers/screen.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
+$(BUILD_DIR)/irq.o: arch/x86/irq.c arch/x86/irq.h arch/x86/pic.h arch/x86/io.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
 $(BUILD_DIR)/gdt.o: arch/x86/gdt.c arch/x86/gdt.h drivers/screen.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/pic.o: arch/x86/pic.c arch/x86/pic.h arch/x86/io.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/keyboard.o: drivers/keyboard.c drivers/keyboard.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/kernel.elf: $(OBJS) linker.ld

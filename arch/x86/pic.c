@@ -27,8 +27,9 @@ void pic_remap(void) {
     outb(PIC1_DATA, 0x01);
     outb(PIC2_DATA, 0x01);
 
-    // disable IRQ0(timer)
-    a1 |= 0x01;
+    // IRQ0 mask, IRQ1 unmask
+    a1 |= 0x01;     // disable timer IRQ0
+    a1 &= ~0x02;    // enable keyboard IRQ1
 
     outb(PIC1_DATA, a1);
     outb(PIC2_DATA, a2);
