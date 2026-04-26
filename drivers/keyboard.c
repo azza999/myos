@@ -81,6 +81,12 @@ typedef struct {
 static keycode_t s_scancode_map[128];
 static keycode_t s_scancode_map_e0[128];
 static input_queue_t s_input_queue;
+static u8_t s_key_down[KEY_MAX];
+static u8_t s_shift = 0;
+static u8_t s_ctrl = 0;
+static u8_t s_alt = 0;
+static u8_t s_caps_lock = 0;
+static u8_t s_num_lock = 0;
 
 static void init_scancode_map(void)
 {
@@ -205,6 +211,8 @@ static unsigned char keyboard_parse_scancode(unsigned char scancode, key_event_t
         return 0;
     }
 
+    s_key_down[key] = released ? 0 : 1;
+
     released = scancode & 0x80;
     code = scancode & 0x7F;
 
@@ -221,6 +229,32 @@ static unsigned char keyboard_parse_scancode(unsigned char scancode, key_event_t
 
     ev->key = key;
     ev->pressed = released ? 0 : 1;
+
+    // shift
+    if (key == KEY_LEFTSHIFT || key == KEY_RIGHTSHIFT) {
+        s_shift = ev->pressed;
+    }
+
+    // ctrl
+    if (key == KEY_LEFTCTRL || key == KEY_RIGHTCTRL) {
+        s_ctrl = ev->pressed;
+    }
+
+    // alt
+    if (key == KEY_LEFTALT || key == KEY_RIGHTALT) {
+        s_alt = ev->pressed;
+    }
+
+    // caps lock (토글!)
+    if (key == KEY_CAPSLOCK && ev->pressed) {
+        s_caps_lock ^= 1;
+    }
+    
+    ev->shift = s_shift;
+    ev->ctrl = s_ctrl;
+    ev->alt = s_alt;
+    ev->caps_lock = s_caps_lock;
+    ev->num_lock = s_num_lock;
     return 1;
 }
 
@@ -235,7 +269,7 @@ static void input_push_event(key_event_t ev)
     s_input_queue.count++;
 }
 
-uint8_t keyboard_poll_event(key_event_t* ev)
+u8_t keyboard_poll_event(key_event_t* ev)
 {
     if (s_input_queue.count == 0) {
         return 0;
@@ -262,5 +296,61 @@ void keyboard_handle_interrupt(void)
 
     if (keyboard_parse_scancode(scancode, &ev)) {
         input_push_event(ev);
+    }
+}
+
+char keyboard_event_to_ascii(const key_event_t* event)
+{
+    u8_t upper;
+
+    if (!event || !event->pressed) {
+        return 0;
+    }
+
+    upper = event->shift ^ event->caps_lock;
+
+    switch (event->key) {
+        case KEY_A: return upper ? 'A' : 'a';
+        case KEY_B: return upper ? 'B' : 'b';
+        case KEY_C: return upper ? 'C' : 'c';
+        case KEY_D: return upper ? 'D' : 'd';
+        case KEY_E: return upper ? 'E' : 'e';
+        case KEY_F: return upper ? 'F' : 'f';
+        case KEY_G: return upper ? 'G' : 'g';
+        case KEY_H: return upper ? 'H' : 'h';
+        case KEY_I: return upper ? 'I' : 'i';
+        case KEY_J: return upper ? 'J' : 'j';
+        case KEY_K: return upper ? 'K' : 'k';
+        case KEY_L: return upper ? 'L' : 'l';
+        case KEY_M: return upper ? 'M' : 'm';
+        case KEY_N: return upper ? 'N' : 'n';
+        case KEY_O: return upper ? 'O' : 'o';
+        case KEY_P: return upper ? 'P' : 'p';
+        case KEY_Q: return upper ? 'Q' : 'q';
+        case KEY_R: return upper ? 'R' : 'r';
+        case KEY_S: return upper ? 'S' : 's';
+        case KEY_T: return upper ? 'T' : 't';
+        case KEY_U: return upper ? 'U' : 'u';
+        case KEY_V: return upper ? 'V' : 'v';
+        case KEY_W: return upper ? 'W' : 'w';
+        case KEY_X: return upper ? 'X' : 'x';
+        case KEY_Y: return upper ? 'Y' : 'y';
+        case KEY_Z: return upper ? 'Z' : 'z';
+
+        case KEY_0: return event->shift ? ')' : '0';
+        case KEY_1: return event->shift ? '!' : '1';
+        case KEY_2: return event->shift ? '@' : '2';
+        case KEY_3: return event->shift ? '#' : '3';
+        case KEY_4: return event->shift ? '$' : '4';
+        case KEY_5: return event->shift ? '%' : '5';
+        case KEY_6: return event->shift ? '^' : '6';
+        case KEY_7: return event->shift ? '&' : '7';
+        case KEY_8: return event->shift ? '*' : '8';
+        case KEY_9: return event->shift ? '(' : '9';
+
+        case KEY_SPACE: return ' ';
+
+        default:
+            return 0;
     }
 }

@@ -1,7 +1,7 @@
 #ifndef MYOS_DRIVERS_KEYBOARD_H
 #define MYOS_DRIVERS_KEYBOARD_H
 
-#include <stdint.h>
+#include "types.h"
 
 /*
  * Linux-style keycode enum (일부만 예시)
@@ -91,14 +91,22 @@ typedef enum {
 
 /*
  * 입력 이벤트 구조체
+ * 누름/뗌 정보 + 키코드
  */
 typedef struct {
     keycode_t key;
-    uint8_t pressed;
+    u8_t pressed;
+
+    u8_t shift;
+    u8_t ctrl;
+    u8_t alt;
+    u8_t caps_lock;
+    u8_t num_lock;
 } key_event_t;
 
 void keyboard_init(void);
 void keyboard_handle_interrupt(void);
-uint8_t keyboard_poll_event(key_event_t* ev);
+u8_t keyboard_poll_event(key_event_t* ev);
+char keyboard_event_to_ascii(const key_event_t* event);
 
 #endif

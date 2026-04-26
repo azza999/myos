@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "types.h"
 
 static volatile char* s_vga = (volatile char*)0xB8000;
 static unsigned char s_row = 0;
@@ -83,11 +84,28 @@ void put_char(char c)
         return;
     }
 
+    if (c == '\b') {
+        if (s_col > 0) {
+            s_col--;
+            put_char_at(' ',s_col, s_row);
+        }
+        return;
+    }
+
     index = (s_row * 80 + s_col) * 2;
     s_vga[index] = c;
     s_vga[index + 1] = s_color;
 
     move_cursor(s_col + 1, s_row);
+}
+
+void put_char_at(const char c, u8_t col, u8_t row) {
+    // 현재 커서 위치 보존
+    u8_t row_origin = s_row;
+    u8_t col_origin = s_col;
+    move_cursor(col, row);
+    put_char(' ');
+    move_cursor(col_origin, row_origin);
 }
 
 void print(const char* str)

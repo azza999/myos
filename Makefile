@@ -20,6 +20,7 @@ OBJS = \
 	$(BUILD_DIR)/irq.o \
 	$(BUILD_DIR)/gdt.o \
 	$(BUILD_DIR)/pic.o \
+	$(BUILD_DIR)/shell.o \
 	$(BUILD_DIR)/keyboard.o
 
 all: myos.iso
@@ -58,6 +59,9 @@ $(BUILD_DIR)/pic.o: arch/x86/pic.c arch/x86/pic.h arch/x86/io.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/keyboard.o: drivers/keyboard.c drivers/keyboard.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/shell.o: kernel/shell.c include/shell.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/kernel.elf: $(OBJS) linker.ld
