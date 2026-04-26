@@ -1,11 +1,11 @@
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef MYOS_DRIVERS_KEYBOARD_H
+#define MYOS_DRIVERS_KEYBOARD_H
 
 #include <stdint.h>
 
 /*
  * Linux-style keycode enum (일부만 예시)
- * 실제로는 네가 정의한 keycode_t를 그대로 넣으면 된다
+ * 실제로는 더 많은 정의를 keycode_t로 그대로 넣으면 된다
  */
 typedef enum {
     KEY_NONE = 0,
@@ -89,33 +89,16 @@ typedef enum {
     KEY_MAX
 } keycode_t;
 
-
 /*
- * 입력 이벤트 구조
+ * 입력 이벤트 구조체
  */
 typedef struct {
     keycode_t key;
-    uint8_t pressed;   // 1 = down, 0 = up
+    uint8_t pressed;
 } key_event_t;
 
-
-/*
- * 초기화
- */
 void keyboard_init(void);
-
-
-/*
- * IRQ에서 호출 (외부에서 직접 쓸 일은 거의 없음)
- */
 void keyboard_handle_interrupt(void);
-
-
-/*
- * 이벤트 큐에서 하나 꺼내기
- * return: 1 = 이벤트 있음, 0 = 없음
- */
 uint8_t keyboard_poll_event(key_event_t* ev);
-
 
 #endif

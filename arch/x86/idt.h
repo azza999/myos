@@ -1,5 +1,5 @@
-#ifndef IDT_H
-#define IDT_H
+#ifndef MYOS_ARCH_X86_IDT_H
+#define MYOS_ARCH_X86_IDT_H
 
 void idt_init(void);
 

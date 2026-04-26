@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef MYOS_ARCH_X86_IO_H
+#define MYOS_ARCH_X86_IO_H
 
 static inline unsigned char inb(unsigned short port) {
     unsigned char ret;

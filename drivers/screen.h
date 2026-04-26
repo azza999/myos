@@ -1,5 +1,5 @@
-#ifndef SCREEN_H
-#define SCREEN_H
+#ifndef MYOS_DRIVERS_SCREEN_H
+#define MYOS_DRIVERS_SCREEN_H
 
 typedef enum {
     COLOR_BLACK = 0x0,
@@ -18,9 +18,9 @@ typedef enum {
     COLOR_LIGHT_MAGENTA = 0xD,
     COLOR_YELLOW = 0xE,
     COLOR_WHITE = 0xF
-} vga_color;
+} vga_color_t;
 
-unsigned char make_color(vga_color bg, vga_color fg);
+unsigned char make_color(vga_color_t bg, vga_color_t fg);
 void set_color(unsigned char new_color);
 
 void clear_screen(void);

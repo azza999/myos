@@ -1,5 +1,5 @@
-#ifndef GDT_H
-#define GDT_H
+#ifndef MYOS_ARCH_X86_GDT_H
+#define MYOS_ARCH_X86_GDT_H
 
 void gdt_init(void);
 
