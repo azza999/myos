@@ -31,6 +31,7 @@ void move_cursor(unsigned char x, unsigned char y);
 void put_char(char c);
 void put_char_at(const char c, u8_t row, u8_t col);
 void print(const char* str);
+void print_hex(const u32_t val);
 void println(const char* str);
 
 #endif

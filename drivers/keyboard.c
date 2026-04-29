@@ -211,10 +211,10 @@ static unsigned char keyboard_parse_scancode(unsigned char scancode, key_event_t
         return 0;
     }
 
-    s_key_down[key] = released ? 0 : 1;
 
     released = scancode & 0x80;
     code = scancode & 0x7F;
+    s_key_down[key] = released ? 0 : 1;
 
     if (extended) {
         key = s_scancode_map_e0[code];

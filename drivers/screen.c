@@ -1,5 +1,6 @@
 #include "screen.h"
 #include "types.h"
+#include "stdlib.h"
 
 static volatile char* s_vga = (volatile char*)0xB8000;
 static unsigned char s_row = 0;
@@ -121,4 +122,10 @@ void println(const char* str)
 {
     print(str);
     put_char('\n');
+}
+
+void print_hex(const u32_t val) {
+    char buf[12] = {0,};
+    itohex(val, buf);
+    println(buf);
 }

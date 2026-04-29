@@ -18,6 +18,8 @@ section .text
 _start:
     mov esp, stack_top
     mov ebp, 0
+    push ebx
+    push eax
 
     call kernel_main
 

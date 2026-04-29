@@ -9,7 +9,7 @@ TODO: 음수 처리
 
 #define ITOA_BUF_MAX 13
 
-void itoa(int val, char* buf) {
+void itoa(u32_t val, char* buf) {
 	
 	int i = 0, length = 0;
 	char reverse_buf[ITOA_BUF_MAX] = {0,};
@@ -32,7 +32,7 @@ void itoa(int val, char* buf) {
 	i--;
 
 	length = i;
-	buf[length] = 0;
+	buf[length] = '\0';
 
 	for (; i != -1; --i) {
 		buf[length - i] = reverse_buf[i];
@@ -42,7 +42,7 @@ void itoa(int val, char* buf) {
 
 }
 
-void itohex(int val, char* buf) {
+void itohex(u32_t val, char* buf) {
 	char buf_reverse[ITOA_BUF_MAX] = {0,};
 	int idx = 0, length = 0;
 
@@ -50,6 +50,8 @@ void itohex(int val, char* buf) {
 	    buf_reverse[idx++] = val % 16;
 	    val /= 16;
 	}
+
+	buf[idx] = '\0';
 
 	length = --idx;
 
