@@ -10,18 +10,7 @@ static u32_t heap_cursor = KERNEL_HEAP_START;
 
 
 void heap_init(void) {
-	char buf[0x10] = {0,};
-	print("heap_start: ");
-	itohex(heap_start,buf);
-	print(buf);
-	print(" heap_end: ");
-	itohex(heap_end,buf);
-	print(buf);
-	print(" heap_cursor: ");
-	itohex(heap_cursor,buf);
-	println(buf);
-
-
+	heap_dump();
 	return;
 }
 
@@ -90,4 +79,19 @@ void* kmalloc(u32_t size) {
 	println(buf);
 
 	return addr;
+}
+
+void heap_dump(void) {
+	char buf[32] = {0,};
+	println("===== heap dump start =====");
+	print("heap_start: ");
+	itohex(heap_start,buf);
+	print(buf);
+	print(" heap_end: ");
+	itohex(heap_end,buf);
+	print(buf);
+	print(" heap_cursor: ");
+	itohex(heap_cursor,buf);
+	println(buf);
+	println("=====  heap dump end  =====");
 }
