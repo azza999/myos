@@ -1,11 +1,25 @@
 #include "screen.h"
 #include "types.h"
 #include "stdlib.h"
+#include "arch/x86/io.h"
 
 static volatile char* s_vga = (volatile char*)0xB8000;
 static unsigned char s_row = 0;
 static unsigned char s_col = 0;
 static unsigned char s_color = 0x0F;
+
+#define VGA_CTRL_REGISTER 0x3D4
+#define VGA_DATA_REGISTER 0x3D5
+
+static inline void outb(u16_t port, u8_t value);
+
+void enable_cursor(u8_t cursor_start, u8_t cursor_end) {
+    outb(VGA_CTRL_REGISTER, 0x0A);
+    outb(VGA_DATA_REGISTER, cursor_start);
+
+    outb(VGA_CTRL_REGISTER, 0x0B);
+    outb(VGA_DATA_REGISTER, cursor_end);
+}
 
 unsigned char make_color(vga_color_t bg, vga_color_t fg)
 {
@@ -53,6 +67,7 @@ void move_cursor(unsigned char x, unsigned char y)
 
     s_col = x;
     s_row = y;
+    enable_cursor(s_col,s_row);
 }
 
 void clear_screen(void)
@@ -88,8 +103,8 @@ void put_char(char c)
     if (c == '\b') {
         if (s_col > 0) {
             s_col--;
-            put_char_at(' ',s_col, s_row);
         }
+        put_char_at(' ',s_col, s_row);
         return;
     }
 
@@ -105,7 +120,7 @@ void put_char_at(const char c, u8_t col, u8_t row) {
     u8_t row_origin = s_row;
     u8_t col_origin = s_col;
     move_cursor(col, row);
-    put_char(' ');
+    put_char(c);
     move_cursor(col_origin, row_origin);
 }
 

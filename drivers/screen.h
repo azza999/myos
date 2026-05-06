@@ -33,5 +33,6 @@ void put_char_at(const char c, u8_t row, u8_t col);
 void print(const char* str);
 void print_hex(const u32_t val);
 void println(const char* str);
+void enable_cursor(u8_t cursor_start, u8_t cursor_end);
 
 #endif

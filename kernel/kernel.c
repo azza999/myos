@@ -24,9 +24,6 @@ void kernel_main(u32_t magic, multiboot_info_t* mb_info)
 
     shell_init();
 
-    u32_t* addr1 = kmalloc(0x003ffff0);
-    u32_t* addr2 = kmalloc(0x20);
-
     while (1) {
         __asm__ volatile ("hlt");
     }

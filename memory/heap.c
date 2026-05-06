@@ -31,7 +31,7 @@ u8_t heap_page_extend(void) {
 	u32_t new_page = pmm_alloc_page();
 	if (new_page == 0) {
 		println("!!!NO PAGE ALLOCATED!!!");
-	    return 0; // 또는 panic
+	    return 0;
 	}
 	paging_map_page(heap_end, new_page, PAGE_PRESENT | PAGE_RW);
 	heap_end += PAGE_SIZE;
@@ -47,21 +47,10 @@ void* kmalloc(u32_t size) {
 		return NULL;
 	}
 
-	print("kmalloc - requested size: ");
-	itoa(size, buf);
-	println(buf);
-
 	u32_t alloc_start = align_up(heap_cursor, 8);
 	u32_t alloc_end = alloc_start + align_up(size, 8);
 
 	while (heap_is_extend_needed(size)) {
-		print("EXTEND_NEEDED - heap_cursor: ");
-		itohex(heap_cursor, buf);
-		print(buf);
-		print(" heap_end: ");
-		itohex(heap_end, buf);
-		print(buf);
-		print("\n");
     	if (!heap_page_extend()) {
     		return NULL;
     	}
@@ -69,14 +58,6 @@ void* kmalloc(u32_t size) {
 
 	addr = (void*)alloc_start;
 	heap_cursor = alloc_end;
-
-	print("heap cursor updated: ");
-	itohex(heap_cursor, buf);
-	println(buf);
-
-	print("return address: ");
-	itohex(addr, buf);
-	println(buf);
 
 	return addr;
 }
