@@ -7,5 +7,6 @@
 
 void heap_init(void);
 void* kmalloc(u32_t size);
+void heap_dump(void);
 
 #endif

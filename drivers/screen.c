@@ -1,11 +1,43 @@
+/*
+cursor와 pointer가 있음.
+cursor는 깜빡이는 거, pointer는 현재 글자를 출력할 수 있는 위치.
+*/
+
 #include "screen.h"
 #include "types.h"
 #include "stdlib.h"
+#include "arch/x86/io.h"
 
 static volatile char* s_vga = (volatile char*)0xB8000;
-static unsigned char s_row = 0;
-static unsigned char s_col = 0;
+
+static position_t pointer = {0};
+
 static unsigned char s_color = 0x0F;
+
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 24
+#define VGA_CTRL_REGISTER 0x3D4
+#define VGA_DATA_REGISTER 0x3D5
+
+static inline void outb(u16_t port, u8_t value);
+
+void move_cursor(position_t cur) {
+    u16_t pos = cur.y * VGA_WIDTH + cur.x;
+
+    outb(VGA_CTRL_REGISTER, 0x0F);
+    outb(VGA_DATA_REGISTER, (u8_t)(pos & 0xFF));
+
+    outb(VGA_CTRL_REGISTER, 0x0E);
+    outb(VGA_DATA_REGISTER, (u8_t)((pos >> 8) & 0xFF));
+}
+
+void resize_cursor(u8_t cursor_start, u8_t cursor_end) {
+    outb(VGA_CTRL_REGISTER, 0x0A);
+    outb(VGA_DATA_REGISTER, cursor_start);
+
+    outb(VGA_CTRL_REGISTER, 0x0B);
+    outb(VGA_DATA_REGISTER, cursor_end);
+}
 
 unsigned char make_color(vga_color_t bg, vga_color_t fg)
 {
@@ -39,7 +71,7 @@ static void scroll(void)
     }
 }
 
-void move_cursor(unsigned char x, unsigned char y)
+void move_pointer(u8_t x, u8_t y)
 {
     while (x >= 80) {
         x -= 80;
@@ -51,8 +83,8 @@ void move_cursor(unsigned char x, unsigned char y)
         y--;
     }
 
-    s_col = x;
-    s_row = y;
+    pointer.x = x;
+    pointer.y = y;
 }
 
 void clear_screen(void)
@@ -68,7 +100,7 @@ void clear_screen(void)
         }
     }
 
-    move_cursor(0, 0);
+    move_pointer(0, 0);
 }
 
 void put_char(char c)
@@ -76,37 +108,29 @@ void put_char(char c)
     int index;
 
     if (c == '\n') {
-        move_cursor(0, s_row + 1);
+        move_pointer(0, pointer.y + 1);
         return;
     }
 
     if (c == '\r') {
-        move_cursor(0, s_row);
+        move_pointer(0, pointer.y);
         return;
     }
 
     if (c == '\b') {
-        if (s_col > 0) {
-            s_col--;
-            put_char_at(' ',s_col, s_row);
+        if (pointer.x > 0) {
+            pointer.x--;
         }
+        put_char(' ');
+        pointer.x--;
         return;
     }
 
-    index = (s_row * 80 + s_col) * 2;
+    index = (pointer.y * 80 + pointer.x) * 2;
     s_vga[index] = c;
     s_vga[index + 1] = s_color;
 
-    move_cursor(s_col + 1, s_row);
-}
-
-void put_char_at(const char c, u8_t col, u8_t row) {
-    // 현재 커서 위치 보존
-    u8_t row_origin = s_row;
-    u8_t col_origin = s_col;
-    move_cursor(col, row);
-    put_char(' ');
-    move_cursor(col_origin, row_origin);
+    move_pointer(pointer.x + 1, pointer.y);
 }
 
 void print(const char* str)
@@ -124,8 +148,19 @@ void println(const char* str)
     put_char('\n');
 }
 
+void print_int(const u32_t val) {
+    char buf[12] = {0,};
+    itoa(val, buf);
+    println(buf);
+}
+
 void print_hex(const u32_t val) {
     char buf[12] = {0,};
     itohex(val, buf);
     println(buf);
+}
+
+position_t get_current_pointer(void) {
+    position_t position = {pointer.x, pointer.y};
+    return position;
 }

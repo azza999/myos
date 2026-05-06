@@ -66,3 +66,9 @@ void itohex(u32_t val, char* buf) {
 
 	return;
 }
+
+void memset(void* dst, u8_t val, u8_t size) {
+	for (u8_t i = 0; i < size; i++) {
+		*((u8_t*)dst + i) = val;
+	}
+}

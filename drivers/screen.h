@@ -26,12 +26,14 @@ unsigned char make_color(vga_color_t bg, vga_color_t fg);
 void set_color(unsigned char new_color);
 
 void clear_screen(void);
-void move_cursor(unsigned char x, unsigned char y);
+void move_cursor(position_t cur);
+void move_pointer(u8_t x, u8_t y);
 
 void put_char(char c);
 void put_char_at(const char c, u8_t row, u8_t col);
 void print(const char* str);
 void print_hex(const u32_t val);
 void println(const char* str);
+position_t get_current_pointer(void);
 
 #endif
